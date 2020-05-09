@@ -410,6 +410,65 @@ xiaoming.hasOwnProperty('name'); // true
 xiaoming.hasOwnProperty('toString'); // false
 ```
 
+##### 标准对象
+
+###### Date
+
+`Date`对象用来表示日期和时间。 
+
+```javascript
+var now = new Date();
+now; // Wed Jun 24 2015 19:49:22 GMT+0800 (CST)
+now.getFullYear(); // 2015, 年份
+now.getMonth(); // 5, 月份，注意月份范围是0~11，5表示六月
+now.getDate(); // 24, 表示24号
+now.getDay(); // 3, 表示星期三
+now.getHours(); // 19, 24小时制
+now.getMinutes(); // 49, 分钟
+now.getSeconds(); // 22, 秒
+now.getMilliseconds(); // 875, 毫秒数
+now.getTime(); // 1435146562875, 以number形式表示的时间戳
+```
+
+###### RegExp
+
+第一种方式是直接通过`/正则表达式/`写出来，第二种方式是通过`new RegExp('正则表达式')`创建一个RegExp对象。
+
+ RegExp对象的`test()`方法用于测试给定的字符串是否符合条件。
+
+ 如果正则表达式中定义了组，用`()`表示的就是要提取的分组（Group） ，就可以在`RegExp`对象上用`exec()`方法提取出子串来 
+
+`exec()`方法在匹配成功后，会返回一个`Array`，第一个元素是正则表达式匹配到的整个字符串，后面的字符串表示匹配成功的子串。
+
+ ###### JSON
+
+JSON是JavaScript Object Notation的缩写，它是一种数据交换格式。
+
+拿到一个JSON格式的字符串，我们直接用`JSON.parse()`把它变成一个JavaScript对象：
+
+```javascript
+JSON.parse('[1,2,3,true]'); // [1, 2, 3, true]
+JSON.parse('{"name":"小明","age":14}'); // Object {name: '小明', age: 14}
+JSON.parse('true'); // true
+JSON.parse('123.45'); // 123.45
+```
+
+`JSON.parse()`还可以接收一个函数，用来转换解析出的属性：  
+
+```javascript
+var obj = JSON.parse('{"name":"小明","age":14}', function (key, value) {
+    if (key === 'name') {
+        return value + '同学';
+    }
+    return value;
+});
+console.log(JSON.stringify(obj)); // {name: '小明同学', age: 14}
+```
+
+
+
+
+
 #### 变量var
 
 申明一个变量用`var`语句。
@@ -795,6 +854,313 @@ parseInt('30');
 console.log('count = ' + count); // 3
 
 ```
+
+### 高阶函数（可以接受函数作为参数的函数）
+
+JavaScript的函数其实都指向某个变量。既然变量可以指向函数，函数的参数能接收变量，那么一个函数就可以接收另一个函数作为参数，这种函数就称之为高阶函数。
+
+#### map/reduce（Array的函数）
+
+`map()`方法定义在JavaScript的`Array`中，我们调用`Array`的`map()`方法，传入我们自己的函数，就得到了一个新的`Array`作为结果。
+
+```javascript
+'use strict';
+function pow(x) {
+    return x * x;
+}
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var results = arr.map(pow); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
+console.log(results);
+```
+
+Array的`reduce()`把一个函数作用在这个`Array`的`[x1, x2, x3...]`上，这个函数必须接收两个参数，`reduce()`把结果继续和序列的下一个元素做累积计算，其效果就是：
+
+```
+[x1, x2, x3, x4].reduce(f) = f(f(f(x1, x2), x3), x4)
+```
+
+```javascript
+var arr = [1, 3, 5, 7, 9];
+arr.reduce(function (x, y) { //J因为直接放在reduce中，就不用申明函数名字var =
+    return x + y;
+}); // 25
+```
+
+#### filter（Array的函数，根据true/false进行过滤）
+
+和`map()`类似，`Array`的`filter()`也接收一个函数。和`map()`不同的是，`filter()`把传入的函数依次作用于每个元素，然后根据返回值是`true`还是`false`决定保留还是丢弃该元素。 
+
+利用`filter`，可以巧妙地去除`Array`的重复元素：  
+
+```javascript
+'use strict';
+
+var
+    r,
+    arr = ['apple', 'strawberry', 'banana', 'pear', 'apple', 'orange', 'orange', 'strawberry'
+           
+r = arr.filter(function (element, index, self) {
+    return self.indexOf(element) === index;
+});
+```
+
+#### sort(Array的函数，根据正负进行排序)
+
+`Array`的`sort()`方法就是用于排序的，`sort()`方法会直接对`Array`进行修改，它返回的结果仍是当前`Array` 。
+
+```javascript
+'use strict';
+
+var arr = [10, 20, 1, 2];
+arr.sort(function (x, y) {
+    if (x < y) {
+        return -1;
+    }
+    if (x > y) {
+        return 1;
+    }
+    return 0;
+});
+console.log(arr); // [1, 2, 10, 20]
+```
+
+#### find(Array的函数，返回第一个值)
+
+`find()`方法用于查找符合条件的第一个元素，如果找到了，返回这个元素，否则，返回`undefined`：  
+
+```javascript
+'use strict';
+var arr = ['Apple', 'pear', 'orange'];
+console.log(arr.find(function (s) {
+    return s.toLowerCase() === s;
+})); // 'pear', 因为pear全部是小写
+
+console.log(arr.find(function (s) {
+    return s.toUpperCase() === s;
+})); // undefined, 因为没有全部是大写的元素
+```
+
+
+
+#### forEach(iterable的函数包括Array，不返回)
+
+ `forEach()`和`map()`类似，它也把每个元素依次作用于传入的函数，但不会返回新的数组。`forEach()`常用于遍历数组，因此，传入的函数不需要返回值：  
+
+```javascript
+'use strict';
+var arr = ['Apple', 'pear', 'orange'];
+arr.forEach(console.log); // 依次打印每个元素
+```
+
+### 匿名函数
+
+理论上讲，创建一个匿名函数并立刻执行可以这么写：
+
+```javascript
+function (x) { return x * x } (3);
+```
+
+但是由于JavaScript语法解析的问题，会报SyntaxError错误，因此需要用括号把整个函数定义括起来：
+
+```javascript
+(function (x) { return x * x }) (3);
+```
+
+通常，一个立即执行的匿名函数可以把函数体拆开，一般这么写：
+
+```javascript
+(function (x) {
+    return x * x;
+})(3);
+```
+
+### 箭头函数（类似匿名函数，this指向上下文）
+
+```javascript
+x => x * x
+```
+
+上面的箭头函数相当于：
+
+```javascript
+function (x) {
+    return x * x;
+}
+```
+
+如果参数不是一个，就需要用括号`()`括起来。还可以包含多条语句，这时候就不能省略`{ ... }`和`return` 。
+
+```javascript
+// 两个参数:
+(x, y) => x * x + y * y
+
+// 无参数:
+() => 3.14
+
+// 可变参数:
+(x, y, ...rest) => {
+    var i, sum = x + y;
+    for (i=0; i<rest.length; i++) {
+        sum += rest[i];
+    }
+    return sum;
+}
+```
+箭头函数完全修复了this的指向，this总是指向词法作用域，也就是外层调用者obj：
+
+
+```javascript
+var obj = {
+    birth: 1990,
+    getAge: function () {
+        var b = this.birth; // 1990
+        var fn = () => new Date().getFullYear() - this.birth; // this指向obj对象
+        return fn();
+    }
+};
+obj.getAge(); // 25
+```
+
+如果使用箭头函数，以前的那种hack写法`var that = this;`就不再需要了。
+
+### 闭包（程序结构：返回函数延迟执行；内部函数可以引用外部函数的参数和局部变量；闭包就是携带状态的函数，并且它的状态可以完全对外隐藏起来）
+
+```javaScript
+function lazy_sum(arr) {
+    var sum = function () {
+        return arr.reduce(function (x, y) {
+            return x + y;
+        });
+    }
+    return sum;
+}
+```
+
+当我们调用`lazy_sum()`时，返回的并不是求和结果，而是求和函数：
+
+```javascript
+var f = lazy_sum([1, 2, 3, 4, 5]); // function sum()
+```
+
+调用函数`f`时，才真正计算求和的结果：
+
+```javascript
+f(); // 15
+```
+
+在这个例子中，**我们在函数`lazy_sum`中又定义了函数`sum`，并且，内部函数`sum`可以引用外部函数`lazy_sum`的参数和局部变量，当`lazy_sum`返回函数`sum`时，相关参数和变量都保存在返回的函数中**，这种称为“闭包（Closure）”的程序结构拥有极大的威力。
+
+### 迭代器generator（function* yield定义，记住执行状态的函数 for (var x of fib(10))或next）
+
+generator和函数不同的是，generator由`function*`定义（注意多出的`*`号），并且，除了`return`语句，还可以用`yield`返回多次。 
+
+```javascript
+'use strict'
+
+function* fib(max) {
+    var
+        t,
+        a = 0,
+        b = 1,
+        n = 0;
+    while (n < max) {
+        yield a;
+        [a, b] = [b, a + b];
+        n ++;
+    }
+    return;
+}
+
+for (var x of fib(10)) {
+    console.log(x); // 依次输出0, 1, 1, 2, 3, ...
+}
+
+var f = fib(5);
+f.next(); // {value: 0, done: false}
+f.next(); // {value: 1, done: false}
+f.next(); // {value: 1, done: false}
+f.next(); // {value: 2, done: false}
+f.next(); // {value: 3, done: false}
+f.next(); // {value: undefined, done: true}
+```
+
+## 面向对象
+
+###原型（JavaScript不区分类和实例，所有对象都是实例，继承就是把一个对象的原型（属性）指向另一个对象）
+
+#### 原型链
+
+JavaScript对每个创建的对象都会设置一个原型，指向它的原型对象。JavaScript的对象中都包含了一个" [[Prototype]]"内部属性，这个属性所对应的就是该对象的原型。**J其实是属性，指向该对象的原型，只是这个属性就叫原型prototype。** 
+
+当我们用`obj.xxx`访问一个对象的属性时，JavaScript引擎先在当前对象上查找该属性，如果没有找到，就到其原型对象上找，如果还没有找到，就一直上溯到`Object.prototype`对象，最后，如果还没有找到，就只能返回`undefined`。
+
+例如，创建一个`Array`对象：
+
+```javascript
+var arr = [1, 2, 3];
+```
+
+其原型链是：
+
+```javascript
+arr ----> Array.prototype ----> Object.prototype ----> null
+```
+
+`Array.prototype`定义了`indexOf()`、`shift()`等方法，因此你可以在所有的`Array`对象上直接调用这些方法。
+
+当我们创建一个函数时：
+
+```javascript
+function foo() {
+    return 0;
+}
+```
+
+函数也是一个对象，它的原型链是：
+
+```javascript
+foo ----> Function.prototype ----> Object.prototype ----> null
+```
+
+由于`Function.prototype`定义了`apply()`等方法，因此，所有函数都可以调用`apply()`方法。
+
+很容易想到，如果原型链很长，那么访问一个对象的属性就会因为花更多的时间查找而变得更慢，因此要注意不要把原型链搞得太长。
+
+####Object.create
+
+`Object.create()`方法可以传入一个原型对象，并创建一个基于该原型的新对象，但是新对象什么属性都没有，因此，我们可以编写一个函数来创建`xiaoming` 
+
+```javascript
+// 原型对象:
+var Student = {
+    name: 'Robot',
+    height: 1.2,
+    run: function () {
+        console.log(this.name + ' is running...');
+    }
+};
+
+function createStudent(name) {
+    // 基于Student原型创建一个新对象:
+    var s = Object.create(Student);
+    // 初始化新对象:
+    s.name = name;
+    return s;
+}
+
+var xiaoming = createStudent('小明');
+xiaoming.run(); // 小明 is running...
+xiaoming.__proto__ === Student; // true
+```
+
+#### 构造函数
+
+
+
+
+
+
+
 
 
 
