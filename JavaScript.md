@@ -333,7 +333,7 @@ arr.join('-'); // 'A-B-C-1-2-3'
 
 如果`Array`的元素不是字符串，将自动转换为字符串后再连接。
 
-#### 对象{}（J类似于字典）
+#### 对象{}（J类似于字典，点调用）
 
 JavaScript的对象是一组由键-值组成的无序集合，例如：
 
@@ -1086,7 +1086,64 @@ f.next(); // {value: undefined, done: true}
 
 ## 面向对象
 
-###原型（JavaScript不区分类和实例，所有对象都是实例，继承就是把一个对象的原型（属性）指向另一个对象）
+###原型（JavaScript不区分类和实例，所有对象都是实例，继承就是把一个对象的原型（属性）指向另一个对象）<u>在其他语言中，类对象，实例对象。而这里没有类的概念，只有对象（函数对象和普通对象），且对象都是实例，即看到实例就知道是对象。</u>
+
+#### 基本概念
+
+#####普通对象和函数对象（通过new Function创建）
+
+JavaScript 中，万物皆对象！但对象也是有区别的。分为普通对象和函数对象，Object 、Function 是 JS 自带的函数对象。
+
+**凡是通过 new Function() 创建的对象都是函数对象，其他的都是普通对象**。
+
+每个对象都有 \_\_proto\_\_ 属性，但只有函数对象才有 prototype 属性
+每个函数对象都有一个prototype 属性，这个属性指向函数的原型对象。
+
+##### 原型对象（声明函数时，自动创建函数的一个实例，赋值到prototype属性，作为之后通过该构造函数创建实例对象的原型对象，其有一个constructor指向所在函数，仔细看附图及其解释）
+
+原型对象就是构造函数的一个实例对象。person.prototype就是person的一个实例对象。相当于在person创建的时候，自动创建了一个它的实例，并且把这个实例赋值给了prototype。
+
+```javascript
+function Person(){};  
+var temp = new Person();  
+Person.prototype = temp; 
+```
+
+也就是声明一个函数时，prototype这个属性就被自动创建了。
+并且这个属性的值是一个对象（也就是原型对象，就是上面的temp，**原型对象（Person.prototype）是 构造函数（Person）的一个实例**），只有一个属性 constructor。
+
+在默认情况下，所有的原型对象都会自动获得一个 constructor（构造函数）属性，这个属性（是一个指针）指向 prototype 属性所在的函数（Person）
+
+其作用是为了原型链：JavaScript对每个创建的对象都会设置一个原型，指向它的原型对象。而这个原型对象就是函数创建时候自带的prototype属性中的对象。
+
+```javascript
+function Student(name) {
+    this.name = name;
+}
+
+Student.prototype.hello = function () {
+    alert('Hello, ' + this.name + '!');
+};
+
+var xiaoming = new Student('小明');
+var xiaohong = new Student('小红');
+
+```
+
+![](picture/prototype.png)
+
+
+
+```linux
+xiaoming ↘
+xiaohong -→ Student.prototype ----> Object.prototype ----> null
+```
+
+**JavaScript对每个创建的对象都会设置一个原型，指向它的原型对象（比如上面的Student.prototype）。而上图的Student.prototype又指向某个对象，就是原型对象，其包含constructor属性，其指向函数Student，加入hello方法，让其可以被共享**。
+
+红色箭头就是原型链。
+
+
 
 #### 原型链
 
@@ -1167,3 +1224,6 @@ xiaoming.__proto__ === Student; // true
 ##Reference
 
 - [JavaScript教程](https://www.liaoxuefeng.com/wiki/1022910821149312 )
+- [最详尽的 JS 原型与原型链终极详解，没有「可能是」。（一）](https://www.jianshu.com/p/dee9f8b14771 )
+- [深度解析JavaScript原型中的各个难点](https://zhuanlan.zhihu.com/p/75004187 )
+- [JS重点整理之JS原型链彻底搞清楚](https://zhuanlan.zhihu.com/p/22787302 )
