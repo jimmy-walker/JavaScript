@@ -1210,14 +1210,115 @@ xiaoming.run(); // 小明 is running...
 xiaoming.__proto__ === Student; // true
 ```
 
-#### 构造函数
+#### 构造函数(new 普通函数，也可以被封装起来)
 
+除了直接用`{ ... }`创建一个对象外，JavaScript还可以用一种构造函数的方法来创建对象。它的用法是，先定义一个构造函数：
 
+```javascript
+function Student(name) {
+    this.name = name;
+    this.hello = function () {
+        alert('Hello, ' + this.name + '!');
+    }
+}
+```
 
+这确实是一个普通函数，但是在JavaScript中，可以用关键字`new`来调用这个函数，并返回一个对象：
 
+```JavaScript
+var xiaoming = new Student('小明');
+xiaoming.name; // '小明'
+xiaoming.hello(); // Hello, 小明!
+```
 
+*注意*，如果不写`new`，这就是一个普通函数，它返回`undefined`。但是，如果写了`new`，它就变成了一个构造函数，它绑定的`this`指向新创建的对象，并默认返回`this`，也就是说，不需要在最后写`return this;`。
 
+我们还可以编写一个`createStudent()`函数，在内部封装所有的`new`操作。一个常用的编程模式像这样：
 
+```javascript
+function Student(props) {
+    this.name = props.name || '匿名'; // 默认值为'匿名'
+    this.grade = props.grade || 1; // 默认值为1
+}
+
+Student.prototype.hello = function () {
+    alert('Hello, ' + this.name + '!');
+};
+
+function createStudent(props) {
+    return new Student(props || {})
+}
+```
+
+这个`createStudent()`函数有几个巨大的优点：一是不需要`new`来调用，二是参数非常灵活，可以不传。
+
+```javascript
+var xiaoming = createStudent({
+    name: '小明'
+});
+
+xiaoming.grade; // 1
+```
+
+####原型继承（暂时不看）
+
+####class继承（构造函数constructor，内部函数定义不用function， extends继承， super父类方法）
+
+新的关键字`class`从ES6开始正式被引入到JavaScript中。`class`的目的就是让定义类更简单。
+
+用函数实现`Student`的方法：
+
+```javascript
+function Student(name) {
+    this.name = name;
+}
+
+Student.prototype.hello = function () {
+    alert('Hello, ' + this.name + '!');
+}
+```
+
+如果用新的`class`关键字来编写`Student`，可以这样写：
+
+```javascript
+class Student {
+    constructor(name) {
+        this.name = name;
+    }
+
+    hello() {
+        alert('Hello, ' + this.name + '!');
+    }
+}
+```
+
+比较一下就可以发现，`class`的定义包含了构造函数`constructor`和定义在原型对象上的函数`hello()`（注意没有`function`关键字），这样就避免了`Student.prototype.hello = function () {...}`这样分散的代码。
+
+最后，创建一个`Student`对象代码和前面一样：
+
+```javascript
+var xiaoming = new Student('小明');
+xiaoming.hello();
+```
+
+用`class`定义对象的另一个巨大的好处是继承更方便了，直接通过`extends`来实现：
+
+```javascript
+class PrimaryStudent extends Student {
+    constructor(name, grade) {
+        super(name); // 记得用super调用父类的构造方法!
+        this.grade = grade;
+    }
+
+    myGrade() {
+        alert('I am at grade ' + this.grade);
+    }
+}
+```
+
+注意`PrimaryStudent`的定义也是class关键字实现的，而`extends`则表示原型链对象来自`Student`。子类的构造函数可能会与父类不太相同，例如，`PrimaryStudent`需要`name`和`grade`两个参数，并且需要通过`super(name)`来调用父类的构造函数，否则父类的`name`属性无法正常初始化。
+
+ES6引入的`class`和原有的JavaScript原型继承有什么区别呢？实际上它们没有任何区别，`class`的作用就是让JavaScript引擎去实现原来需要我们自己编写的原型链代码。简而言之，用`class`的好处就是极大地简化了原型链代码。
 
 
 
