@@ -657,7 +657,7 @@ foo(1);
 
 减少冲突的一个方法是把自己的所有变量和函数全部绑定到一个全局变量中。例如：
 
-```
+```javascript
 // 唯一的全局变量MYAPP:
 var MYAPP = {};
 
@@ -679,11 +679,11 @@ MYAPP.foo = function () {
 
 ###局部作用域
 
-####let变量
+####let变量（在循环for中使用）
 
 由于JavaScript的变量作用域实际上是函数内部，我们在`for`循环等语句块中是无法定义具有局部作用域的变量的：
 
-```
+```javascript
 'use strict';
 
 function foo() {
@@ -696,7 +696,7 @@ function foo() {
 
 为了解决块级作用域，ES6引入了新的关键字`let`，用`let`替代`var`可以申明一个块级作用域的变量：
 
-```
+```javascript
 'use strict';
 
 function foo() {

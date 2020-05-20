@@ -5,5 +5,7 @@
 * [浏览器](浏览器.md)
 * [NodeJs](NodeJs.md)
 * [Rsshub](Rsshub.md)
+* [jQuery](jQuery.md)
+* [underscore](underscore.md)
 
 
