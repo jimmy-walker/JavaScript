@@ -81,7 +81,13 @@ greet(s); // Hello, Michael!
 
 位置在node_modules文件夹下。
 
-而还有一个@没有找到明确解释，可能是指代src目录吧：
+而还有一个@找到明确解释，是指代src目录吧：
+
+如果路径以 . 开头，将会被看作相对的模块依赖。 
+
+如果路径以 @ 开头，也会被看作模块依赖。如果你的 webpack 配置中给 @ 配置了 alias，这就很有用了。所有 vue-cli 创建的项目都默认配置了将 @ 指向 /src。
+
+如果路径以 ~ 开头，其后的部分将会被看作模块依赖，既可以加载含有别名的静态资源，又可以加载node-modules中的资源。 
 
 ```javascript
 const config = require('@/config').value;
@@ -149,3 +155,4 @@ koa是Express的下一代基于Node.js的web框架，目前有1.x和2.0两个版
 ## Reference
 
 - [Node.js教程](https://www.runoob.com/nodejs/nodejs-tutorial.html )
+- [详解vue中静态资源的路径问题](https://segmentfault.com/a/1190000018472635)
